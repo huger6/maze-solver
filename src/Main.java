@@ -1,11 +1,23 @@
+import java.nio.file.Paths;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
-        Maze maze = Maze.fromFile("maze.txt");
+        Maze.generateMaze("prim_maze.txt", 100, 200);
+
+        Maze maze = Maze.fromFile("prim_maze.txt");
 
         if (maze != null) {
-            System.out.println("Maze loaded");
-        }
+            Pathfinder pf = new Pathfinder(maze);
 
-        Maze.generateMaze("prim_maze.txt", 30, 20);
+            List<Node> paths = pf.solve();
+            if (paths != null) {
+                Maze mazeSolved = pf.getMazeSolved(paths);
+                if (mazeSolved != null) {
+                    mazeSolved.drawMaze(Paths.get("prim_maze_solved.txt"));
+                }
+            }
+
+        }
     }
 }

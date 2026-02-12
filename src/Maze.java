@@ -51,6 +51,7 @@ public class Maze {
                     }
                     
                     maze = new Maze(w, h);
+                    break;
                 }
             }
             
@@ -96,23 +97,29 @@ public class Maze {
 
                 // Draw random maze
                 Maze maze = getRandomMaze(width, height);
+                maze.drawMaze(path);
 
-                for (int y = 0; y < height; y++) {
-                    StringBuilder line = new StringBuilder();
-                    for (int x = 0; x < width; x++) {
-                        line.append(maze.drawNode(x, y));
-                    }
-                    writer.write(line.toString());
-                    writer.newLine();
-                }
-                
-
-                System.out.println("Maze generated successfully and saved to !" + filename);
+                System.out.println("Maze generated successfully and saved to " + filename + "!");
             } catch (IOException e) {
                 System.err.println("Error writing to file: " + e.getMessage());
             }
         } catch (Exception e) {
             System.err.println("Error generating maze: " + e.getMessage());
+        }
+    }
+
+    public void drawMaze(Path path) {
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+            for (int y = 0; y < height; y++) {
+                StringBuilder line = new StringBuilder();
+                for (int x = 0; x < width; x++) {
+                    line.append(drawNode(x, y));
+                }
+                writer.write(line.toString());
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Error drawing maze to file: " + e.getMessage());
         }
     }
 
@@ -181,6 +188,7 @@ public class Maze {
             if (node == getStart()) return "S";
             else if (node == getEnd()) return "E";
             else if (node.isWall()) return "#";
+            else if (node.isPath()) return ".";
             return " ";
         } else {
             return "";
@@ -291,5 +299,13 @@ public class Maze {
 
     public Node getEnd() {
         return end;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }
