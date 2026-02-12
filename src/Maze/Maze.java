@@ -1,3 +1,5 @@
+package Maze;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
@@ -96,7 +98,7 @@ public class Maze {
                 writer.newLine();
 
                 // Draw random maze
-                Maze maze = getRandomMaze(width, height);
+                Maze maze = generateMaze(width, height);
                 maze.drawMaze(path);
 
                 System.out.println("Maze generated successfully and saved to " + filename + "!");
@@ -124,7 +126,7 @@ public class Maze {
     }
 
     // Get a random maze using Prim algorithm
-    private static Maze getRandomMaze(int width, int height) {
+    public static Maze generateMaze(int width, int height) {
         try {
             Maze maze = new Maze(width, height);
 

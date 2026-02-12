@@ -1,3 +1,5 @@
+package Maze;
+
 public class Node implements Comparable<Node> {
     public final int x, y;
 

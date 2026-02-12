@@ -1,7 +1,12 @@
+package Pathfinder;
+
 import java.util.PriorityQueue;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+
+import Maze.Maze;
+import Maze.Node;
 
 public class Pathfinder {
     private Maze maze;
