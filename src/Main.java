@@ -5,5 +5,7 @@ public class Main {
         if (maze != null) {
             System.out.println("Maze loaded");
         }
+
+        Maze.generateMaze("prim_maze.txt", 30, 20);
     }
 }

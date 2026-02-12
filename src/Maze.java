@@ -1,7 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
+import java.io.IOException;
+import java.io.BufferedWriter;
 import java.util.Scanner;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Maze {
     private final int width, height;
@@ -70,13 +76,115 @@ public class Maze {
             System.out.println("Maze loaded successfully!");
             return maze;
         } catch (Exception e) {
-            System.out.println("Error reading maze: " + e.getMessage());
+            System.err.println("Error reading maze: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public static void generateMaze(String filename, int width, int height) {
+        try {
+            Path path = Paths.get(filename);
+            String w = "width=" + width;
+            String h = "height=" + height;
+
+            try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+                // Set variables
+                writer.write(w);
+                writer.newLine();
+                writer.write(h);
+                writer.newLine();
+
+                // Draw random maze
+                Maze maze = getRandomMaze(width, height);
+
+                for (int y = 0; y < height; y++) {
+                    StringBuilder line = new StringBuilder();
+                    for (int x = 0; x < width; x++) {
+                        line.append(maze.drawNode(x, y));
+                    }
+                    writer.write(line.toString());
+                    writer.newLine();
+                }
+                
+
+                System.out.println("Maze generated successfully and saved to !" + filename);
+            } catch (IOException e) {
+                System.err.println("Error writing to file: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println("Error generating maze: " + e.getMessage());
+        }
+    }
+
+    // Get a random maze using Prim algorithm
+    private static Maze getRandomMaze(int width, int height) {
+        try {
+            Maze maze = new Maze(width, height);
+
+            // Set all nodes as walls
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    maze.getNode(x, y).setWall(true);
+                }
+            }
+
+            ArrayList<Node> wallList = new ArrayList<>();
+
+            // Get random start point and set it as path
+            Node start = maze.getNode(ThreadLocalRandom.current().nextInt(0, width), ThreadLocalRandom.current().nextInt(0, height));
+
+            start.setWall(false);
+
+            // End node (eventually)
+            Node lastNodeAdded = start;
+
+            // Set start neighbours
+            wallList.addAll(maze.getNeighborsWalls(start));
+
+            while (!wallList.isEmpty()) {
+                // Choose random wall
+                int index = ThreadLocalRandom.current().nextInt(wallList.size());
+                Node wallNode = wallList.get(index);
+
+                // If only one path neighbour, we extend the path
+                if (maze.countEmptyNeighbors(wallNode) == 1) {
+                    wallNode.setWall(false);
+                    lastNodeAdded = wallNode; // update end 
+
+                    // Add new neighbors
+                    for (Node node : maze.getNeighborsWalls(wallNode)) {
+                        if (!wallList.contains(node)) wallList.add(node);
+                    }
+                }
+
+                wallList.remove(index);
+            }
+            
+            // Set start and end
+            maze.setStart(start);
+            maze.setEnd(lastNodeAdded);
+
+            return maze;
+        } catch (Exception e) {
+            System.err.println("Error generating random maze: " + e.getMessage());
             return null;
         }
     }
 
     private boolean isValid(int x, int y) {
         return x >= 0 && x < width && y >= 0 && y < height;
+    }
+
+    private String drawNode(int x, int y) {
+        Node node = getNode(x, y);
+        if (node != null) {
+            if (node == getStart()) return "S";
+            else if (node == getEnd()) return "E";
+            else if (node.isWall()) return "#";
+            return " ";
+        } else {
+            return "";
+        }
     }
 
     public Node getNode(int x, int y) {
@@ -110,6 +218,59 @@ public class Maze {
         }
 
         return neighbors;
+    }
+
+    public List<Node> getNeighborsWalls(Node node) {
+        List<Node> neighbors = new ArrayList<>();
+
+        Node up = getNode(node.x, node.y -1);
+        if (up != null && up.isWall()) {
+            neighbors.add(up);
+        }
+
+        Node down = getNode(node.x, node.y + 1);
+        if (down != null && down.isWall()) {
+            neighbors.add(down);
+        }
+
+        Node left = getNode(node.x - 1, node.y);
+        if (left != null && left.isWall()) {
+            neighbors.add(left);
+        }
+
+        Node right = getNode(node.x + 1, node.y);
+        if (right != null && right.isWall()) {
+            neighbors.add(right);
+        }
+
+        return neighbors;
+    }
+
+    // Returns number of neighbors that are not walls
+    public int countEmptyNeighbors(Node node) {
+        int count = 0;
+
+        Node up = getNode(node.x, node.y -1);
+        if (up != null && !up.isWall()) {
+            count += 1;
+        }
+
+        Node down = getNode(node.x, node.y + 1);
+        if (down != null && !down.isWall()) {
+            count += 1;
+        }
+
+        Node left = getNode(node.x - 1, node.y);
+        if (left != null && !left.isWall()) {
+            count += 1;
+        }
+
+        Node right = getNode(node.x + 1, node.y);
+        if (right != null && !right.isWall()) {
+            count += 1;
+        }
+
+        return count;
     }
 
     // Setters
