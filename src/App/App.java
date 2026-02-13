@@ -12,20 +12,44 @@ import Display.MazeDisplay;
 public class App {
     private Menu menu;
     private JFrame frame;
+    private boolean firstBoot;
 
     public App() {
+        this.firstBoot = true;
         frame = new JFrame("Maze Solver");
-        menu = new Menu(e -> initGame());
-
-        frame.add(menu);
-        frame.pack();
-        frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        menu = new Menu(e -> initGame());
+        
+        showMenu();
+
+        frame.setVisible(true);
     }
 
     public void initGame() {
+        // Fix early warning
+        if (firstBoot) {
+            firstBoot = false;
+            return;
+        }
+
         int width = menu.getMazeWidth();
         int height = menu.getMazeHeight();
+
+        if (width < 5 || height < 5) {
+            JOptionPane.showMessageDialog(frame,
+                "Please insert valid dimensions (minimum: 5).",
+                "Invalid input",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (width > 700 || height > 700) {
+            JOptionPane.showMessageDialog(frame,
+                "Dimensions above 700 might not be visible or very hard to spot!",
+                "Warning",
+                JOptionPane.WARNING_MESSAGE);
+        }
 
         System.out.println("Generating maze of " + width + "x" + height);
 

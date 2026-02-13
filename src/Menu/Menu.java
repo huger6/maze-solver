@@ -18,8 +18,8 @@ public class Menu extends JPanel {
 
         JPanel inputPanel = new JPanel(new GridLayout(3, 2, 10, 10));
 
-        widthField = new JTextField("30");
-        heightField = new JTextField("12");
+        widthField = new JTextField("");
+        heightField = new JTextField("");
         generateBtn = new JButton("Generate Maze");
         generateBtn.addActionListener(onGenerate);
 
@@ -54,10 +54,22 @@ public class Menu extends JPanel {
     }
 
     public int getMazeWidth() {
-        return Integer.parseInt(widthField.getText().trim());
+        try {
+            String text = widthField.getText().trim();
+            if (text.isEmpty()) return -1;
+            return Integer.parseInt(text);
+        } catch(NumberFormatException e) {
+            return -1;
+        }
     }
 
     public int getMazeHeight() {
-        return Integer.parseInt(heightField.getText().trim());
+        try {
+            String text = heightField.getText().trim();
+            if (text.isEmpty()) return -1;
+            return Integer.parseInt(text);
+        } catch(NumberFormatException e) {
+            return -1;
+        }
     }
 }

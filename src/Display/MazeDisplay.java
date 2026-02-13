@@ -18,6 +18,8 @@ public class MazeDisplay extends JPanel {
     private Runnable onExit;
 
     public MazeDisplay(Maze maze, List<Node> fullPath, Runnable onExit) {
+        System.out.println("Maze Display constructor");
+
         this.maze = maze;
         this.fullPath = fullPath;
         this.onExit = onExit;
